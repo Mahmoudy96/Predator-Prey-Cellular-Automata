@@ -1,59 +1,73 @@
 from backend import *
 from matplotlib import pyplot as plt
 
-def iterate(board):
-    # Neighbors array to find 8 neighboring cells for a given cell
-    neighbors = [(1,0), (1,-1), (0,-1), (-1,-1), (-1,0), (-1,1), (0,1), (1,1)]
 
-    rows = len(board)
-    cols = len(board[0])
+def plot_lotka_volterra():
+    pred_br = 0.015
+    pred_dr = 0.5
+    prey_br = 0.5
+    prey_dr = 0.015
+    prey = [100]
+    predators = [10]
+    # Defining the time frame
+    delta_time = 0.01
+    cycles = 4500
 
-    # Create a copy of the original board
-    copy_board = [[board[row][col] for col in range(cols)] for row in range(rows)]
+    # The model
+    for t in range(0, cycles):
+        updated_chickens = prey[t] + delta_time * (prey_br * prey[t]  - prey_dr * predators[t] * prey[t])
+        updated_foxes = predators[t] + delta_time * (-pred_dr * predators[t] + pred_br * predators[t] * prey[t])
+        prey.append(updated_chickens)
+        predators.append(updated_foxes)
 
-    # Iterate through board cell by cell.
-    for row in range(rows):
-        for col in range(cols):
+    # plotting
+    time_points = range(cycles + 1)
+    plt.figure()
+    plt.plot(time_points, predators)
+    plt.plot(time_points, prey)
+    plt.xlabel('time')
+    plt.show()
 
-            # For each cell count the number of live neighbors.
-            live_neighbors = 0
-            for neighbor in neighbors:
 
-                r = (row + neighbor[0])
-                c = (col + neighbor[1])
+def plot_population_dynamics(time_array, prey, predators):
+    plt.figure()
+    plt.plot(time_stamps, prey_pop, color='b')
+    plt.plot(time_stamps, pred_pop, color='r')
+    plt.xlabel("Generations")
+    plt.ylabel("Prey(b) and Predator(r) Population")
+    plt.show()
 
-                # Check the validity of the neighboring cell and if it was originally a live cell.
-                # The evaluation is done against the copy, since that is never updated.
-                if (r < rows and r >= 0) and (c < cols and c >= 0) and (copy_board[r][c] == 1):
-                    live_neighbors += 1
 
-            # Rule 1 or Rule 3        
-            if copy_board[row][col] == 1 and (live_neighbors < 2 or live_neighbors > 3):
-                board[row][col] = 0
-            # Rule 4
-            if copy_board[row][col] == 0 and live_neighbors == 3:
-                board[row][col] = 1
-    return board
+def plot_phase_portrait(predators, prey):
+    plt.figure()
+    plt.plot(prey_pop, pred_pop)
+    plt.xlabel("Prey Population")
+    plt.ylabel("Predator Population")
+    plt.show()
+
 
 if __name__ == '__main__':
     #create desired game
-    new_game = PPAC(n_rows=20, n_cols=20, visuals_on=True)
+    predator_br = 0.8
+    predator_dr = 0.4
+    prey_brr = 0.7
+    prey_drr = 0.5
+    init_prey = 200
+    init_predators = 100
+    new_game = PPAC(n_rows=40, n_cols=40,initial_predators=init_predators,initial_prey=init_prey,predator_birth_rate=predator_br
+                    ,predator_death_rate=predator_dr,prey_birth_rate=prey_brr, prey_death_rate=prey_drr, visuals_on=True)
     #new_game.print_board()
-    new_game.iterate(100)
+    new_game.iterate(1000)
     print(new_game.saved_data, new_game.probabilities)
     #information is saved in created object, use saved_data to view data, create graphs and plots, etc...
     data = [(i.Generation, i.NumberOfPrey, i.NumberOfPredators) for i in new_game.saved_data]
     time_stamps = [i[0] for i in data]
     prey_pop = [i[1] for i in data]
     pred_pop = [i[2] for i in data]
-    plt.figure()
-    plt.plot(time_stamps, prey_pop)
-    plt.legend("Prey")
-    plt.plot(time_stamps, pred_pop)
-    plt.legend("Predators")
-    plt.show()
-
-
+    plot_population_dynamics(time_stamps, prey_pop, pred_pop)
+    plot_phase_portrait(pred_pop, prey_pop)
+    #create plots based on LV equations to create comparison
+    plot_lotka_volterra()
 
 #Define the rules
 #Create the board, with a certain amount of predator and prey cells/nodes
