@@ -15,8 +15,11 @@ class CellType(Enum):
     PREDATOR = 2
     KILLED = 3
 
+
 PPACProbabilities = namedtuple("Probabilities", ["PreyDeathRate", "PredDeathRate", "PreyBirthRate", "PredBirthRate"])
 PPACData = namedtuple("Data", ["Generation", "NumberOfPrey", "NumberOfPredators"])
+
+
 class PPAC:
     '''
     Predator-Prey Cellular Automaton
@@ -66,7 +69,7 @@ class PPAC:
 
         #visuals placeholders, TODO: manage this properly
         self.visuals = visuals_on
-        self.shown = False
+        #self.shown = False
         self.win = None #pygame window placeholder
 
     def populate_board(self):
@@ -246,17 +249,17 @@ class PPAC:
                 self.visuals = False
         scale_factor_x = int(400/self.n_columns)
         scale_factor_y = int(400/self.n_rows)
-        mat = np.ones((self.n_columns*scale_factor_x, self.n_rows*scale_factor_y), dtype=(int,3)) * 255
+        mat = np.ones((self.n_columns*scale_factor_x, self.n_rows*scale_factor_y), dtype=(int, 3)) * 255
         for row in self.board:
             for cell in row:
                 cell_x = cell.column*scale_factor_x
                 cell_y = cell.row*scale_factor_y
-                color = (255,255,255)
+                color = (255, 255, 255)
                 if cell.cell_type == CellType.PREY:
-                    color = (0,0,255)
+                    color = (0, 0, 255)
                 elif cell.cell_type == CellType.PREDATOR:
-                    color = (255,0,0)
+                    color = (255, 0, 0)
                 mat[cell_x:cell_x+scale_factor_x, cell_y:cell_y+scale_factor_y] = color
         surf = pygame.surfarray.make_surface(mat)
-        self.win.blit(surf,(0,0))
+        self.win.blit(surf, (0, 0))
         pygame.display.update()
