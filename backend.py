@@ -102,7 +102,7 @@ class PPAC:
         maybe not a good idea? potentially infinite loop
         :return:
         '''
-        while not self.dead_board():
+        while not self.stale_board():
             self.iterate()
 
     def iterate(self, number_of_iterations=1):
@@ -117,9 +117,8 @@ class PPAC:
                 #self.print_board()
                 #self.render_board()
                 self.render_board()
-            else:
-                self.print_board()
-            if self.dead_board():
+            if self.stale_board():
+
                 print("Game over!")
                 break
 
@@ -175,17 +174,25 @@ class PPAC:
             self.n_prey, self.n_predator = self.get_board_data()
             self.saved_data.append(PPACData(Generation=self.generation, NumberOfPrey=self.n_prey, NumberOfPredators=self.n_predator))
 
-    def dead_board(self):
+    def stale_board(self):
         '''
         checks if there are any predators/prey on the board
         :return:
         '''
+
+        '''
         dead = True
+
         for row in self.board:
             for cell in row:
                 if cell.cell_type == CellType.PREDATOR or cell.cell_type == CellType.PREY:
                     dead = False
         return dead
+        '''
+        if (self.n_predator == 0 and self.n_prey == 0) or self.n_prey == self.n_rows*self.n_columns:
+            return True
+        else:
+            return False
 
     def get_board_data(self):
         '''
